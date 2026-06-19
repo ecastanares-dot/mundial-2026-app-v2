@@ -87,6 +87,13 @@ function getMatchesForDate(dateKey: string, phase?: Match['phase']) {
   return MATCHES.filter((match) => dateKeyInMonterrey(match.etKickoff) === dateKey && (!phase || match.phase === phase));
 }
 
+function groupStageRound(match: Match) {
+  if (match.phase !== 'Grupo') return undefined;
+  if (match.no <= 24) return 'Ronda 1';
+  if (match.no <= 48) return 'Ronda 2';
+  return 'Ronda 3';
+}
+
 function Header() {
   return (
     <header className="hero">
@@ -257,20 +264,35 @@ function GroupStageSection({
       .sort((a, b) => new Date(a.etKickoff).getTime() - new Date(b.etKickoff).getTime() || a.no - b.no);
   }, [groupMatches, dateFilter]);
 
+  const rounds = ['Ronda 1', 'Ronda 2', 'Ronda 3'].map((round) => ({
+    round,
+    matches: matches.filter((match) => groupStageRound(match) === round),
+  })).filter((item) => item.matches.length > 0);
+
   return (
     <section>
       <div className="sectionTitle">
         <div>
           <h2>Fase de grupos</h2>
-          <p>Calendario de la primera fase con captura de marcador. Todos los horarios se muestran en hora de Monterrey, México.</p>
+          <p>Calendario de la primera fase organizado por Ronda 1, Ronda 2 y Ronda 3. Todos los horarios se muestran en hora de Monterrey, México.</p>
         </div>
         <select value={dateFilter} onChange={(event) => setDateFilter(event.target.value)}>
           <option value="todos">Todos los días</option>
           {dateOptions.map((dateKey) => <option key={dateKey} value={dateKey}>{dateLabelFromKey(dateKey)}</option>)}
         </select>
       </div>
-      <div className="matchGrid">
-        {matches.map((match) => <MatchCard key={match.no} match={match} scores={scores} setScores={setScores} extras={extras} />)}
+      <div className="groupRounds">
+        {rounds.map(({ round, matches: roundMatches }) => (
+          <section className="groupRoundBlock" key={round}>
+            <div className="roundHeader">
+              <h3>{round}</h3>
+              <span>{roundMatches.length} partido(s)</span>
+            </div>
+            <div className="matchGrid">
+              {roundMatches.map((match) => <MatchCard key={match.no} match={match} scores={scores} setScores={setScores} extras={extras} />)}
+            </div>
+          </section>
+        ))}
       </div>
     </section>
   );
@@ -582,7 +604,7 @@ export default function Home() {
       const seed = seededOfficialScores();
       const storedScores = window.localStorage.getItem(STORAGE_RESULTS) ?? window.localStorage.getItem('wc2026-results-v1');
       const parsedScores = storedScores ? JSON.parse(storedScores) as ScoresByMatch : {};
-      setScores(mergeMissingScores(parsedScores, seed));
+      setScores({ ...parsedScores, ...seed });
 
       const storedExtras = window.localStorage.getItem(STORAGE_EXTRAS);
       if (storedExtras) setExtras({ ...defaultExtras(), ...JSON.parse(storedExtras) });
@@ -661,7 +683,7 @@ export default function Home() {
         <button className={tab === 'criterios' ? 'active' : ''} onClick={() => setTab('criterios')}>Criterios FIFA</button>
       </nav>
       <div className="statusBar">
-        <span>{completed} / 104 marcadores capturados · Resultados del 11 de junio ya precargados</span>
+        <span>{completed} / 104 marcadores capturados · Resultados precargados hasta Canadá vs Catar</span>
         <button onClick={reset} className="ghostBtn">Reiniciar</button>
       </div>
       {tab === 'faseGrupos' && <GroupStageSection scores={scores} setScores={setScores} extras={extras} dateFilter={dateFilter} setDateFilter={setDateFilter} />}

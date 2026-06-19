@@ -510,3 +510,32 @@ tr.third td strong { color: var(--cyan); }
   .cityList { position: static; max-height: none; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
 }
 .winnerSelect { grid-column: 1 / -1; }
+
+.groupRounds {
+  display: grid;
+  gap: 22px;
+}
+.groupRoundBlock {
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  padding: 16px;
+  background:
+    radial-gradient(circle at 0 0, rgba(37, 213, 255, .08), transparent 18rem),
+    rgba(12,24,52,.66);
+}
+.roundHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.roundHeader h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  letter-spacing: -.02em;
+}
+.roundHeader span {
+  color: var(--muted);
+  font-size: .9rem;
+}
