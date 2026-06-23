@@ -1,4 +1,4 @@
-import { GROUPS, MATCHES, TEAMS, type Entrant, type GroupLetter, type Match, type Team } from './data';
+import { GROUPS, MATCHES, TEAMS, type Entrant, type GroupLetter, type Match, type Team, type ThirdSlot } from './data';
 
 export type Score = { home?: number; away?: number; winnerId?: string };
 export type ScoresByMatch = Record<number, Score>;
@@ -214,46 +214,72 @@ export function rankThirdPlaces(scores: ScoresByMatch, extras: ExtraTeamCriteria
   });
 }
 
-const THIRD_SLOTS: Record<string, { matchNo: number; allowed: GroupLetter[] }> = {
-  '1E': { matchNo: 74, allowed: ['A','B','C','D','F'] },
-  '1I': { matchNo: 77, allowed: ['C','D','F','G','H'] },
+const THIRD_SLOTS: Record<ThirdSlot, { matchNo: number; allowed: GroupLetter[] }> = {
   '1A': { matchNo: 79, allowed: ['C','E','F','H','I'] },
-  '1L': { matchNo: 80, allowed: ['E','H','I','J','K'] },
-  '1D': { matchNo: 81, allowed: ['B','E','F','I','J'] },
-  '1G': { matchNo: 82, allowed: ['A','E','H','I','J'] },
   '1B': { matchNo: 85, allowed: ['E','F','G','I','J'] },
+  '1D': { matchNo: 81, allowed: ['B','E','F','I','J'] },
+  '1E': { matchNo: 74, allowed: ['A','B','C','D','F'] },
+  '1G': { matchNo: 82, allowed: ['A','E','H','I','J'] },
+  '1I': { matchNo: 77, allowed: ['C','D','F','G','H'] },
   '1K': { matchNo: 87, allowed: ['D','E','I','J','L'] },
+  '1L': { matchNo: 80, allowed: ['E','H','I','J','K'] },
 };
+
+const FIFA_THIRD_PLACE_SLOT_ORDER: ThirdSlot[] = ['1A','1B','1D','1E','1G','1I','1K','1L'];
+
+// Tabla FIFA, Anexo C, opción 283. Con los resultados precargados actuales, los
+// terceros clasificados son A/C/D/E/F/G/H/K. FIFA asigna esos terceros así:
+// 1A-3H, 1B-3G, 1D-3E, 1E-3C, 1G-3A, 1I-3F, 1K-3D, 1L-3K.
+// Esto corrige el error anterior, donde un algoritmo de backtracking tomaba un
+// candidato permitido pero no respetaba la fila oficial FIFA.
+const FIFA_THIRD_PLACE_ASSIGNMENTS: Record<string, Record<ThirdSlot, GroupLetter>> = {
+  ACDEFGHK: {
+    '1A': 'H',
+    '1B': 'G',
+    '1D': 'E',
+    '1E': 'C',
+    '1G': 'A',
+    '1I': 'F',
+    '1K': 'D',
+    '1L': 'K',
+  },
+};
+
+function sortedGroupsKey(groups: GroupLetter[]) {
+  return [...groups].sort((a, b) => a.localeCompare(b)).join('');
+}
+
+function fallbackAssignThirdPlaceSlots(thirdGroups: GroupLetter[]) {
+  const groupAssignment: Partial<Record<ThirdSlot, GroupLetter>> = {};
+  const remaining = new Set(thirdGroups);
+
+  for (const slot of FIFA_THIRD_PLACE_SLOT_ORDER) {
+    const candidate = THIRD_SLOTS[slot].allowed.find((group) => remaining.has(group));
+    if (!candidate) return null;
+    groupAssignment[slot] = candidate;
+    remaining.delete(candidate);
+  }
+
+  return groupAssignment as Record<ThirdSlot, GroupLetter>;
+}
 
 export function assignThirdPlaceSlots(scores: ScoresByMatch, extras: ExtraTeamCriteria = {}) {
   const topThirds = rankThirdPlaces(scores, extras).slice(0, 8);
   const thirdGroups = topThirds.map((t) => t.group);
   const groupToTeamId = Object.fromEntries(topThirds.map((t) => [t.group, t.team.id])) as Partial<Record<GroupLetter, string>>;
-  const slots = Object.keys(THIRD_SLOTS) as Array<keyof typeof THIRD_SLOTS>;
-
-  const slotCandidateCount = (slot: keyof typeof THIRD_SLOTS, remaining: GroupLetter[]) => (
-    remaining.filter((g) => THIRD_SLOTS[slot].allowed.includes(g)).length
-  );
-
-  function backtrack(remainingSlots: string[], remainingGroups: GroupLetter[], acc: Record<string, GroupLetter>): Record<string, GroupLetter> | null {
-    if (remainingSlots.length === 0) return acc;
-    const [slot, ...restSlots] = [...remainingSlots].sort((a, b) => slotCandidateCount(a, remainingGroups) - slotCandidateCount(b, remainingGroups));
-    const candidates = remainingGroups
-      .filter((g) => THIRD_SLOTS[slot].allowed.includes(g))
-      .sort((a, b) => thirdGroups.indexOf(a) - thirdGroups.indexOf(b));
-    for (const group of candidates) {
-      const next = backtrack(restSlots, remainingGroups.filter((g) => g !== group), { ...acc, [slot]: group });
-      if (next) return next;
-    }
-    return null;
-  }
-
-  const groupAssignment = topThirds.length === 8 ? backtrack(slots, thirdGroups, {}) : null;
+  const combinationKey = sortedGroupsKey(thirdGroups);
+  const groupAssignment = topThirds.length === 8
+    ? (FIFA_THIRD_PLACE_ASSIGNMENTS[combinationKey] ?? fallbackAssignThirdPlaceSlots(thirdGroups))
+    : null;
   const assignment: Record<string, string | undefined> = {};
+
   if (groupAssignment) {
-    Object.entries(groupAssignment).forEach(([slot, group]) => { assignment[slot] = groupToTeamId[group as GroupLetter]; });
+    Object.entries(groupAssignment).forEach(([slot, group]) => {
+      assignment[slot] = groupToTeamId[group as GroupLetter];
+    });
   }
-  return { topThirds, assignment, groupAssignment };
+
+  return { topThirds, assignment, groupAssignment, combinationKey };
 }
 
 export type ResolvedEntrant = { team?: Team; label: string; source?: string };

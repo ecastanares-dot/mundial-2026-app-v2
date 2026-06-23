@@ -539,3 +539,23 @@ tr.third td strong { color: var(--cyan); }
   color: var(--muted);
   font-size: .9rem;
 }
+
+.groupRoundBlock > summary {
+  list-style: none;
+  cursor: pointer;
+}
+.groupRoundBlock > summary::-webkit-details-marker {
+  display: none;
+}
+.groupRoundBlock > summary::after {
+  content: 'Mostrar / ocultar';
+  color: var(--muted);
+  font-size: .82rem;
+  margin-left: auto;
+}
+.groupRoundBlock:not([open]) .roundHeader {
+  margin-bottom: 0;
+}
+.groupRoundBlock:not([open]) .matchGrid {
+  display: none;
+}

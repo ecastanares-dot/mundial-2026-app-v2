@@ -283,15 +283,15 @@ function GroupStageSection({
       </div>
       <div className="groupRounds">
         {rounds.map(({ round, matches: roundMatches }) => (
-          <section className="groupRoundBlock" key={round}>
-            <div className="roundHeader">
+          <details className="groupRoundBlock" key={round} open={round !== 'Ronda 3'}>
+            <summary className="roundHeader">
               <h3>{round}</h3>
               <span>{roundMatches.length} partido(s)</span>
-            </div>
+            </summary>
             <div className="matchGrid">
               {roundMatches.map((match) => <MatchCard key={match.no} match={match} scores={scores} setScores={setScores} extras={extras} />)}
             </div>
-          </section>
+          </details>
         ))}
       </div>
     </section>
@@ -683,7 +683,7 @@ export default function Home() {
         <button className={tab === 'criterios' ? 'active' : ''} onClick={() => setTab('criterios')}>Criterios FIFA</button>
       </nav>
       <div className="statusBar">
-        <span>{completed} / 104 marcadores capturados · Resultados precargados hasta Canadá vs Catar</span>
+        <span>{completed} / 104 marcadores capturados · Resultados precargados hasta Argentina vs Austria</span>
         <button onClick={reset} className="ghostBtn">Reiniciar</button>
       </div>
       {tab === 'faseGrupos' && <GroupStageSection scores={scores} setScores={setScores} extras={extras} dateFilter={dateFilter} setDateFilter={setDateFilter} />}

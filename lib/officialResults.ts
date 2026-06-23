@@ -38,6 +38,21 @@ export const OFFICIAL_RESULTS: OfficialResult[] = [
   { matchNo: 25, date: '2026-06-18', home: 1, away: 1, source: 'Marcador publicado / FIFA Match Centre', lastUpdated: '2026-06-19T00:15:00-06:00' },
   { matchNo: 26, date: '2026-06-18', home: 4, away: 1, source: 'Marcador publicado / FIFA Match Centre', lastUpdated: '2026-06-19T00:15:00-06:00' },
   { matchNo: 27, date: '2026-06-18', home: 6, away: 0, source: 'Marcador publicado / FIFA Match Centre', lastUpdated: '2026-06-19T00:15:00-06:00' },
+  { matchNo: 28, date: '2026-06-18', home: 1, away: 0, source: 'Marcador publicado / FIFA Match Centre', lastUpdated: '2026-06-23T00:00:00-06:00' },
+  { matchNo: 29, date: '2026-06-19', home: 3, away: 0, source: 'Marcador publicado / FIFA Match Centre', lastUpdated: '2026-06-23T00:00:00-06:00' },
+  { matchNo: 30, date: '2026-06-19', home: 0, away: 1, source: 'Marcador publicado / FIFA Match Centre', lastUpdated: '2026-06-23T00:00:00-06:00' },
+  { matchNo: 31, date: '2026-06-19', home: 0, away: 1, source: 'Marcador publicado / FIFA Match Centre', lastUpdated: '2026-06-23T00:00:00-06:00' },
+  { matchNo: 32, date: '2026-06-19', home: 2, away: 0, source: 'Marcador publicado / FIFA Match Centre', lastUpdated: '2026-06-23T00:00:00-06:00' },
+  { matchNo: 33, date: '2026-06-20', home: 2, away: 1, source: 'Marcador publicado / FIFA Match Centre', lastUpdated: '2026-06-23T00:00:00-06:00' },
+  { matchNo: 34, date: '2026-06-20', home: 0, away: 0, source: 'Marcador publicado / FIFA Match Centre', lastUpdated: '2026-06-23T00:00:00-06:00' },
+  { matchNo: 35, date: '2026-06-20', home: 5, away: 1, source: 'Marcador publicado / FIFA Match Centre', lastUpdated: '2026-06-23T00:00:00-06:00' },
+  { matchNo: 36, date: '2026-06-21', home: 0, away: 4, source: 'Marcador publicado / FIFA Match Centre', lastUpdated: '2026-06-23T00:00:00-06:00' },
+  { matchNo: 37, date: '2026-06-21', home: 2, away: 2, source: 'Marcador publicado / FIFA Match Centre', lastUpdated: '2026-06-23T00:00:00-06:00' },
+  { matchNo: 38, date: '2026-06-21', home: 4, away: 0, source: 'Marcador publicado / FIFA Match Centre', lastUpdated: '2026-06-23T00:00:00-06:00' },
+  { matchNo: 39, date: '2026-06-21', home: 0, away: 0, source: 'Marcador publicado / FIFA Match Centre', lastUpdated: '2026-06-23T00:00:00-06:00' },
+  { matchNo: 40, date: '2026-06-21', home: 1, away: 3, source: 'Marcador publicado / FIFA Match Centre', lastUpdated: '2026-06-23T00:00:00-06:00' },
+  { matchNo: 42, date: '2026-06-22', home: 3, away: 0, source: 'Marcador publicado / FIFA Match Centre', lastUpdated: '2026-06-23T00:00:00-06:00' },
+  { matchNo: 43, date: '2026-06-22', home: 2, away: 0, source: 'Marcador publicado / FIFA Match Centre', lastUpdated: '2026-06-23T00:00:00-06:00' },
 ];
 
 export function seededOfficialScores(): ScoresByMatch {
